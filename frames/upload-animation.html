@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lipstick Story — Upload Cinematic UI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06090f;
+  --border:rgba(180,100,130,.13);
+  --accent:#ff6eb4;
+  --accent2:#c850e8;
+  --accent3:#ff9ad5;
+  --text:#f0d0e0;
+  --muted:#6e4a5a;
+  --success:#ff9ec8;
+  --green:#00dfa0;
+}
+html,body{width:100%;height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text);display:flex;align-items:center;justify-content:center;overflow:hidden}
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0}
+.orb1{width:450px;height:450px;top:-130px;right:-120px;background:rgba(255,110,180,.055)}
+.orb2{width:350px;height:350px;bottom:-90px;left:-90px;background:rgba(200,80,232,.05)}
+.orb3{width:200px;height:200px;top:40%;left:50%;transform:translate(-50%,-50%);background:rgba(255,160,213,.03)}
+
+/* CARD */
+.card{
+  position:relative;z-index:10;width:min(600px,95vw);
+  background:linear-gradient(155deg,#170e18 0%,#0f0a15 55%,#120c14 100%);
+  border:1px solid var(--border);border-radius:32px;padding:48px 48px 52px;
+  box-shadow:
+    0 0 0 1px rgba(255,110,180,.06),
+    0 40px 100px rgba(0,0,0,.8),
+    0 0 120px rgba(255,110,180,.06) inset;
+}
+
+/* HEADER */
+.header{display:flex;align-items:center;gap:18px;margin-bottom:36px}
+.cloud-btn{
+  width:56px;height:56px;flex-shrink:0;border-radius:18px;
+  background:linear-gradient(135deg,#2a0e22,#3d1535);
+  border:1px solid rgba(255,110,180,.28);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 30px rgba(255,110,180,.22),0 0 60px rgba(255,110,180,.08) inset;
+}
+.cloud-btn svg{width:28px;height:28px}
+.hdr-right h1{font-size:19px;font-weight:700;letter-spacing:-.4px;color:#fce4f0}
+.hdr-right p{font-size:12.5px;color:var(--muted);margin-top:4px;letter-spacing:.1px}
+
+/* SCROLL WINDOW */
+.scroll-win{
+  position:relative;height:248px;overflow:hidden;border-radius:18px;
+  background:rgba(8,3,10,.7);border:1px solid var(--border);margin-bottom:28px;
+}
+.scroll-win::before,.scroll-win::after{content:'';position:absolute;left:0;right:0;z-index:4;pointer-events:none}
+.scroll-win::before{top:0;height:56px;background:linear-gradient(to bottom,rgba(8,3,10,.98),transparent)}
+.scroll-win::after{bottom:0;height:68px;background:linear-gradient(to top,rgba(8,3,10,1),transparent)}
+
+.scan{
+  position:absolute;left:0;right:0;bottom:68px;height:1px;z-index:5;
+  background:linear-gradient(90deg,transparent,var(--accent) 30%,var(--accent2) 70%,transparent);
+  box-shadow:0 0 16px 5px rgba(255,110,180,.5);opacity:0;transition:opacity .4s;
+}
+.track{position:absolute;top:0;left:0;right:0;display:flex;flex-direction:column;will-change:transform}
+
+/* FILE ROW */
+.row{
+  display:flex;align-items:center;gap:14px;padding:10px 18px;
+  border-bottom:1px solid rgba(255,255,255,.03);
+  opacity:0;transform:translateY(20px);transition:opacity .42s ease,transform .42s ease;
+}
+.row.vis{opacity:1;transform:translateY(0)}
+.row.done{opacity:.28}
+
+/* thumbnail */
+.thumb{
+  width:44px;height:44px;flex-shrink:0;border-radius:10px;
+  overflow:hidden;border:1px solid rgba(255,110,180,.18);
+  background:#1a0a14;display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.thumb img{
+  width:100%;height:100%;object-fit:cover;
+  transition:opacity .4s ease;
+  opacity:0;
+}
+.thumb img.loaded{opacity:1}
+.thumb-ext{
+  position:absolute;bottom:2px;right:3px;
+  font-size:7px;font-weight:800;letter-spacing:.3px;
+  background:rgba(0,0,0,.65);padding:1px 4px;border-radius:3px;
+}
+
+.finfo{flex:1;min-width:0}
+.fname{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fce4f0}
+.fmeta{font-size:10.5px;color:var(--muted);margin-top:2.5px}
+
+.fstat{width:22px;height:22px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.ring{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,110,180,.18);border-top-color:var(--accent);animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* PROGRESS */
+.prog-wrap{margin-bottom:22px}
+.prog-lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:10px}
+.prog-lbl span:last-child{color:var(--accent);font-weight:700;font-size:13px}
+.prog-track{height:7px;border-radius:99px;background:rgba(255,255,255,.05);overflow:hidden}
+.prog-fill{
+  height:100%;border-radius:99px;width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--accent2),#9050ff);
+  box-shadow:0 0 16px rgba(255,110,180,.6);
+  transition:width .32s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;
+}
+.prog-fill::after{
+  content:'';position:absolute;top:0;bottom:0;left:-100%;width:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);
+  animation:shim 1.6s ease-in-out infinite;
+}
+@keyframes shim{0%{left:-100%}100%{left:220%}}
+
+/* STATS */
+.stats{display:flex;gap:12px;margin-bottom:26px}
+.stat{flex:1;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:14px;padding:12px 14px}
+.stat-lbl{font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.stat-val{font-size:14px;font-weight:700;color:#fce4f0}
+
+/* BUTTONS */
+.btns{display:flex;gap:12px}
+.btn{flex:1;padding:13px;border-radius:14px;border:none;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .22s}
+.btn-sec{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted)}
+.btn-sec:hover{background:rgba(255,255,255,.08);color:var(--text)}
+.btn-prim{
+  background:linear-gradient(135deg,#2e0c22,#42123a);
+  border:1px solid rgba(255,110,180,.3);color:var(--accent);
+  box-shadow:0 0 24px rgba(255,110,180,.15);
+}
+.btn-prim:hover{box-shadow:0 0 36px rgba(255,110,180,.3);transform:translateY(-1px)}
+
+/* SUCCESS OVERLAY */
+.success{
+  position:absolute;inset:0;border-radius:32px;
+  background:linear-gradient(155deg,#110818,#09050f);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  opacity:0;pointer-events:none;transition:opacity .55s ease;z-index:20;
+  padding:32px;
+}
+.success.show{opacity:1;pointer-events:all}
+.check-ring{
+  width:96px;height:96px;border-radius:50%;flex-shrink:0;
+  background:radial-gradient(circle,rgba(0,223,160,.14) 0%,transparent 68%);
+  border:2px solid rgba(0,223,160,.32);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 48px rgba(0,223,160,.28);
+  animation:popIn .65s cubic-bezier(.22,.68,0,1.6) both;
+}
+@keyframes popIn{0%{transform:scale(0) rotate(-20deg);opacity:0}60%{transform:scale(1.14) rotate(4deg);opacity:1}80%{transform:scale(.95) rotate(-2deg)}90%{transform:scale(1.04) rotate(1deg)}100%{transform:scale(1) rotate(0)}}
+.check-ring svg{width:50px;height:50px}
+.cp{stroke-dasharray:85;stroke-dashoffset:85;animation:draw .6s .25s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+.suc-title{font-size:22px;font-weight:800;color:#fce4f0;letter-spacing:-.4px}
+.suc-sub{font-size:12.5px;color:var(--muted);text-align:center;max-width:300px;line-height:1.65}
+
+/* GALLERY STRIP */
+.gallery{
+  display:flex;gap:6px;flex-wrap:wrap;justify-content:center;
+  max-width:420px;max-height:120px;overflow:hidden;
+}
+.gthumb{
+  width:52px;height:52px;border-radius:8px;overflow:hidden;
+  border:1px solid rgba(255,110,180,.2);flex-shrink:0;
+  background:#1a0a14;
+}
+.gthumb img{width:100%;height:100%;object-fit:cover}
+
+.badges{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.badge{padding:5px 14px;border-radius:99px;font-size:12px;font-weight:600;background:rgba(0,223,160,.07);border:1px solid rgba(0,223,160,.2);color:var(--green)}
+.btn-done{
+  padding:13px 48px;
+  background:linear-gradient(135deg,rgba(0,223,160,.14),rgba(0,223,160,.06));
+  border:1px solid rgba(0,223,160,.28);border-radius:16px;
+  color:var(--green);font-family:inherit;font-size:14px;font-weight:700;
+  cursor:pointer;box-shadow:0 0 36px rgba(0,223,160,.13);transition:all .25s;
+}
+.btn-done:hover{box-shadow:0 0 52px rgba(0,223,160,.28);transform:translateY(-2px)}
+
+#pcv{position:fixed;inset:0;pointer-events:none;z-index:1}
+@media(max-width:520px){.card{padding:26px 18px 30px;border-radius:22px}.stats{flex-wrap:wrap}.stat{min-width:calc(50% - 6px)}}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<canvas id="pcv"></canvas>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div class="card" id="mainCard">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="cloud-btn">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 17V9M12 9L9 12M12 9L15 12" stroke="#ff6eb4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6.5 16.8A4.2 4.2 0 0 1 6.5 9h.3A5.7 5.7 0 0 1 17.7 9.7a3.8 3.8 0 0 1 .3 7.1" stroke="#ff6eb4" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="hdr-right">
+      <h1>Uploading — Lipstick Story</h1>
+      <p id="hSub">Preparing 28 campaign images…</p>
+    </div>
+  </div>
+
+  <!-- SCROLL WINDOW -->
+  <div class="scroll-win" id="scrollWin">
+    <div class="scan" id="scan"></div>
+    <div class="track" id="track"></div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="prog-wrap">
+    <div class="prog-lbl"><span id="plabel">Initialising…</span><span id="ppct">0%</span></div>
+    <div class="prog-track"><div class="prog-fill" id="pfill"></div></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="stat-lbl">Completed</div><div class="stat-val" id="sFiles">0 / 0</div></div>
+    <div class="stat"><div class="stat-lbl">Speed</div><div class="stat-val" id="sSpeed">—</div></div>
+    <div class="stat"><div class="stat-lbl">Remaining</div><div class="stat-val" id="sTime">—</div></div>
+    <div class="stat"><div class="stat-lbl">Total</div><div class="stat-val" id="sSize">—</div></div>
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="btns">
+    <button class="btn btn-sec" id="bPause">⏸ Pause</button>
+    <button class="btn btn-prim" id="bCancel">✕ Cancel</button>
+  </div>
+
+  <!-- SUCCESS OVERLAY -->
+  <div class="success" id="sOver">
+    <div class="check-ring">
+      <svg viewBox="0 0 50 50" fill="none">
+        <path class="cp" d="M13 26.5L21.5 35.5L38 17" stroke="#00dfa0" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="suc-title">Upload Complete ✦</div>
+    <div class="suc-sub" id="sMsg">All 28 campaign images transferred securely.</div>
+    <!-- mini gallery of uploaded images -->
+    <div class="gallery" id="sucGallery"></div>
+    <div class="badges">
+      <span class="badge" id="bFiles">28 files</span>
+      <span class="badge" id="bSize">~64 MB</span>
+      <span class="badge" id="bTime">—</span>
+    </div>
+    <button class="btn-done" id="bDone">✓ Done</button>
+  </div>
+
+</div>
+
+<script>
+/* ── BASE PATH for images ── */
+const IMG_BASE = 'C:/Users/RAJESH/OneDrive/Attachments/Desktop/images/';
+
+/* ── FILE LIST (real filenames + sizes from images folder) ── */
+const FILES = [
+  {n:'lipstick-01-rose-small-bud.jpg',          s:'1.9 MB', ext:'JPG'},
+  {n:'lipstick-02-rose-beginning-open.jpg',      s:'1.9 MB', ext:'JPG'},
+  {n:'lipstick-03-rose-opening-further.jpg',     s:'1.9 MB', ext:'JPG'},
+  {n:'lipstick-05-rose-full-bloom.jpg',          s:'1.6 MB', ext:'JPG'},
+  {n:'lipstick-06-petals-falling.jpg',           s:'1.8 MB', ext:'JPG'},
+  {n:'lipstick-07-pigment-mold.jpg',             s:'1.6 MB', ext:'JPG'},
+  {n:'lipstick-08-finished-standing.jpg',        s:'1.4 MB', ext:'JPG'},
+  {n:'lipstick-09-hand-picking-up.jpg',          s:'1.7 MB', ext:'JPG'},
+  {n:'lipstick-10-woman-applying-front.jpg',     s:'1.8 MB', ext:'JPG'},
+  {n:'lipstick-11-editorial-widescape.png',      s:'2.1 MB', ext:'PNG'},
+  {n:'lipstick-12-newsletter-portrait.png',      s:'2.8 MB', ext:'PNG'},
+  {n:'lipstick-13-pigment-texture-macro.png',    s:'2.4 MB', ext:'PNG'},
+  {n:'lipstick-14-bullet-top-down.png',          s:'2.6 MB', ext:'PNG'},
+  {n:'lipstick-15-fingers-gripping-detail.png',  s:'2.8 MB', ext:'PNG'},
+  {n:'lipstick-16-lips-macro-final.png',         s:'3.2 MB', ext:'PNG'},
+  {n:'lipstick-17-shade-lineup.png',             s:'2.8 MB', ext:'PNG'},
+  {n:'lipstick-18-swatch-classic-red.png',       s:'3.3 MB', ext:'PNG'},
+  {n:'lipstick-19-swatch-rose-nude.png',         s:'3.4 MB', ext:'PNG'},
+  {n:'lipstick-20-swatch-berry-plum.png',        s:'3.4 MB', ext:'PNG'},
+  {n:'lipstick-21-tube-capped-standing.png',     s:'1.9 MB', ext:'PNG'},
+  {n:'lipstick-22-packaging-box-ribbon.png',     s:'2.6 MB', ext:'PNG'},
+  {n:'lipstick-23-pigment-swipe-paper.png',      s:'3.7 MB', ext:'PNG'},
+  {n:'lipstick-24-model-two-applying.png',       s:'2.9 MB', ext:'PNG'},
+  {n:'lipstick-25-model-two-lips-macro.png',     s:'3.3 MB', ext:'PNG'},
+  {n:'lipstick-26-vanity-mirror-scene.png',      s:'2.9 MB', ext:'PNG'},
+  {n:'lipstick-27-clutch-lifestyle.png',         s:'3.3 MB', ext:'PNG'},
+  {n:'lipstick-28-daylight-portrait.png',        s:'2.7 MB', ext:'PNG'},
+];
+
+/* ── TOTAL SIZE ── */
+const TOTAL_SIZE = '~64 MB';
+
+/* ── STARFIELD ── */
+(()=>{
+  const c=document.getElementById('stars'),ctx=c.getContext('2d');
+  let W,H,S=[];
+  const resize=()=>{W=c.width=innerWidth;H=c.height=innerHeight};
+  resize();addEventListener('resize',resize);
+  for(let i=0;i<240;i++)S.push({x:Math.random(),y:Math.random(),r:.15+Math.random()*1.2,a:Math.random(),da:.0015+Math.random()*.004});
+  const loop=()=>{
+    ctx.clearRect(0,0,W,H);
+    S.forEach(s=>{
+      s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;
+      ctx.globalAlpha=s.a*.38;ctx.fillStyle='#ffbbdd';
+      ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r,0,6.28);ctx.fill();
+    });
+    requestAnimationFrame(loop);
+  };loop();
+})();
+
+/* ── PARTICLES ── */
+(()=>{
+  const c=document.getElementById('pcv'),ctx=c.getContext('2d');
+  let W,H;
+  const P=[],COLS=['#ff6eb4','#c850e8','#ff9ad5','#e070ff','#ffaad8','#00dfa0'];
+  const resize=()=>{W=c.width=innerWidth;H=c.height=innerHeight};
+  resize();addEventListener('resize',resize);
+  window.spark=(x,y,n=4)=>{
+    for(let i=0;i<n;i++){
+      const a=Math.random()*6.28,sp=.5+Math.random()*2;
+      P.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1.1,
+        r:.5+Math.random()*2.8,c:COLS[0|Math.random()*6],l:1,d:.009+Math.random()*.02});
+    }
+  };
+  const loop=()=>{
+    ctx.clearRect(0,0,W,H);
+    for(let i=P.length-1;i>=0;i--){
+      const p=P[i];p.x+=p.vx;p.y+=p.vy;p.vy+=.04;p.l-=p.d;
+      if(p.l<=0){P.splice(i,1);continue}
+      ctx.globalAlpha=p.l*.82;ctx.fillStyle=p.c;ctx.shadowColor=p.c;ctx.shadowBlur=9;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.28);ctx.fill();
+    }
+    ctx.globalAlpha=1;ctx.shadowBlur=0;
+    requestAnimationFrame(loop);
+  };loop();
+})();
+
+/* ── BUILD ROWS ── */
+const track   = document.getElementById('track');
+const scan    = document.getElementById('scan');
+const rows    = [];
+const ROW_H   = 64;
+
+FILES.forEach((f,i)=>{
+  const isJpg = f.ext === 'JPG';
+  const extColor = isJpg ? '#ff9ad5' : '#e070ff';
+  const r = document.createElement('div');
+  r.className = 'row';
+
+  // Use file:// protocol for local images
+  const imgSrc = 'file:///' + IMG_BASE + f.n;
+
+  r.innerHTML = `
+    <div class="thumb">
+      <img src="${imgSrc}" alt="${f.n}" onload="this.classList.add('loaded')" onerror="this.style.display='none'"/>
+      <span class="thumb-ext" style="color:${extColor}">${f.ext}</span>
+    </div>
+    <div class="finfo">
+      <div class="fname">${f.n}</div>
+      <div class="fmeta">${f.s} &nbsp;·&nbsp; Campaign Image ${String(i+1).padStart(2,'0')}</div>
+    </div>
+    <div class="fstat" id="fs${i}"><div class="ring"></div></div>`;
+  track.appendChild(r);
+  rows.push(r);
+});
+
+/* ── BUILD SUCCESS GALLERY ── */
+const gallery = document.getElementById('sucGallery');
+FILES.forEach(f=>{
+  const d = document.createElement('div');
+  d.className = 'gthumb';
+  const imgSrc = 'file:///' + IMG_BASE + f.n;
+  d.innerHTML = `<img src="${imgSrc}" alt="${f.n}" loading="lazy"/>`;
+  gallery.appendChild(d);
+});
+
+/* ── ENGINE ── */
+const pfill   = document.getElementById('pfill');
+const ppct    = document.getElementById('ppct');
+const plabel  = document.getElementById('plabel');
+const hSub    = document.getElementById('hSub');
+const sFiles  = document.getElementById('sFiles');
+const sSpeed  = document.getElementById('sSpeed');
+const sTime   = document.getElementById('sTime');
+const sSize   = document.getElementById('sSize');
+const sOver   = document.getElementById('sOver');
+const scrollWin = document.getElementById('scrollWin');
+
+let cur=0, fp=0, tot=0, paused=false, t0=Date.now(), af;
+// simulated per-file speeds (MB/s)
+const spd = FILES.map(()=>(6+Math.random()*14).toFixed(1));
+const fmt = s => s<60 ? Math.ceil(s)+'s' : Math.floor(s/60)+'m '+Math.ceil(s%60)+'s';
+
+function tick(){
+  if(paused){af=requestAnimationFrame(tick);return}
+  fp += 1.4 + Math.random()*2.4;
+
+  if(fp >= 100){
+    // mark done
+    const el = document.getElementById('fs'+cur);
+    el.innerHTML = `<svg viewBox="0 0 18 18" fill="none">
+      <circle cx="9" cy="9" r="8" fill="rgba(0,223,160,.1)" stroke="rgba(0,223,160,.3)" stroke-width="1"/>
+      <path d="M5.5 9.2L8 11.8L12.5 6.5" stroke="#00dfa0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+    rows[cur].classList.add('done');
+
+    // burst particles
+    const rect = scrollWin.getBoundingClientRect();
+    const px = rect.left + rect.width*(.2 + Math.random()*.6);
+    for(let k=0;k<12;k++) window.spark(px+(Math.random()-.5)*80, rect.bottom-72+(Math.random()-.5)*20);
+
+    cur++; fp=0;
+    if(cur >= FILES.length){finish(); return}
+
+    rows[cur].classList.add('vis');
+    const off = Math.max(0, cur-2) * ROW_H;
+    track.style.transition = 'transform .56s cubic-bezier(.4,0,.2,1)';
+    track.style.transform  = 'translateY(-'+off+'px)';
+    if(cur+1 < FILES.length) rows[cur+1].classList.add('vis');
+    scan.style.opacity = '1';
+  }
+
+  tot = Math.min(99.5, (cur/FILES.length)*100 + (fp/FILES.length));
+  pfill.style.width = tot.toFixed(1)+'%';
+  ppct.textContent  = Math.round(tot)+'%';
+
+  const elapsed = (Date.now()-t0)/1000;
+  const rem = tot>2 ? (elapsed/(tot/100))*(1-tot/100) : 0;
+
+  sFiles.textContent = cur+' / '+FILES.length;
+  sSpeed.textContent = (spd[cur]||'—')+' MB/s';
+  sTime.textContent  = tot>3 ? fmt(rem) : 'Calculating…';
+  hSub.textContent   = 'Uploading '+(cur+1)+' of '+FILES.length+' \u2014 '+Math.round(tot)+'%';
+  plabel.textContent = 'Uploading "'+( FILES[cur] ? FILES[cur].n : '')+'"';
+
+  setTimeout(()=>{af=requestAnimationFrame(tick)}, 26);
+}
+
+function finish(){
+  pfill.style.width = '100%'; ppct.textContent = '100%';
+  plabel.textContent = 'Upload complete!';
+  scan.style.opacity = '0';
+  hSub.textContent   = 'All 28 campaign images transferred';
+  const elapsed = (Date.now()-t0)/1000;
+  document.getElementById('bFiles').textContent = FILES.length+' files';
+  document.getElementById('bSize').textContent  = TOTAL_SIZE;
+  document.getElementById('bTime').textContent  = fmt(elapsed);
+  document.getElementById('sMsg').textContent   =
+    'All '+FILES.length+' Lipstick Story images uploaded in '+fmt(elapsed)+'.';
+  setTimeout(()=>{
+    sOver.classList.add('show');
+    const r = document.getElementById('mainCard').getBoundingClientRect();
+    const cx=r.left+r.width/2, cy=r.top+r.height/2;
+    for(let i=0;i<65;i++)
+      setTimeout(()=>window.spark(cx+(Math.random()-.5)*200,cy+(Math.random()-.5)*110,1), i*18);
+  }, 380);
+}
+
+function init(){
+  sSize.textContent  = TOTAL_SIZE;
+  sFiles.textContent = '0 / '+FILES.length;
+  rows[0].classList.add('vis');
+  if(rows[1]) rows[1].classList.add('vis');
+  scan.style.opacity = '1';
+  t0 = Date.now();
+  setTimeout(()=>{af=requestAnimationFrame(tick)}, 700);
+}
+
+/* CONTROLS */
+document.getElementById('bPause').addEventListener('click',function(){
+  paused=!paused;
+  this.textContent = paused ? '▶ Resume' : '⏸ Pause';
+  scan.style.opacity = paused ? '0' : '1';
+});
+document.getElementById('bCancel').addEventListener('click',()=>{
+  cancelAnimationFrame(af);
+  plabel.textContent = 'Upload cancelled.';
+  scan.style.opacity = '0';
+  hSub.textContent   = 'Transfer stopped by user';
+  const b = document.getElementById('bCancel');
+  b.textContent = '↺ Retry';
+  b.addEventListener('click',()=>location.reload(),{once:true});
+});
+document.getElementById('bDone').addEventListener('click',()=>{
+  sOver.classList.remove('show');
+  setTimeout(()=>location.reload(), 500);
+});
+
+init();
+</script>
+</body>
+</html>
