@@ -328,7 +328,8 @@
     .hero-section {
       position: relative;
       width: 100%;
-      height: 180vh; /* Effortless two-finger scroll on laptops and light touch on phones */
+      height: 180vh;
+      /* Effortless two-finger scroll on laptops and light touch on phones */
       background: var(--bg-dark);
       touch-action: pan-y;
     }
@@ -354,7 +355,8 @@
       object-fit: cover;
       display: block;
       touch-action: pan-y;
-      pointer-events: none; /* Let two-finger scroll and touch gestures pass through seamlessly */
+      pointer-events: none;
+      /* Let two-finger scroll and touch gestures pass through seamlessly */
     }
 
     .hero-overlay-container {
@@ -439,7 +441,8 @@
 
     @media (max-width: 768px) {
       .hero-section {
-        height: 140vh; /* Ultra-light swipe for Android & iPhones */
+        height: 140vh;
+        /* Ultra-light swipe for Android & iPhones */
       }
 
       .hero-sticky {
@@ -477,7 +480,8 @@
       display: flex;
       background: #0a0506;
       border: 1px solid rgba(201, 166, 117, 0.12);
-      overflow: visible !important; /* CRITICAL: Allows position:sticky to work seamlessly */
+      overflow: visible !important;
+      /* CRITICAL: Allows position:sticky to work seamlessly */
     }
 
     .explainer-left {
@@ -587,8 +591,17 @@
     }
 
     @keyframes pulseGlow {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.35; transform: scale(0.75); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.35;
+        transform: scale(0.75);
+      }
     }
 
     .hud-counter {
@@ -1461,10 +1474,12 @@
               <img src="images/lipstick-06-petals-falling.jpg" alt="Velvet Petal Dispersion" class="explainer-img">
             </div>
             <div class="exp-slide" data-caption="STAGE III • LIQUID PIGMENT MICRO-FLOW">
-              <img src="images/lipstick-13-pigment-texture-macro.png" alt="Liquid Pigment Micro-Flow" class="explainer-img">
+              <img src="images/lipstick-13-pigment-texture-macro.png" alt="Liquid Pigment Micro-Flow"
+                class="explainer-img">
             </div>
             <div class="exp-slide" data-caption="STAGE IV • MOLTEN CHROMATIC RELEASE">
-              <img src="images/lipstick-23-pigment-swipe-paper.png" alt="Molten Chromatic Release" class="explainer-img">
+              <img src="images/lipstick-23-pigment-swipe-paper.png" alt="Molten Chromatic Release"
+                class="explainer-img">
             </div>
             <div class="exp-slide" data-caption="STAGE V • HIGH-CHROMA SATIN SWATCH">
               <img src="images/lipstick-18-swatch-classic-red.png" alt="High-Chroma Satin Swatch" class="explainer-img">
@@ -1483,10 +1498,12 @@
               <img src="images/lipstick-17-shade-lineup.png" alt="Atelier Shade Spectrum" class="explainer-img">
             </div>
             <div class="exp-slide" data-caption="PROCESS IV • MAGNETIC MONOLITH CASING">
-              <img src="images/lipstick-21-tube-capped-standing.png" alt="Magnetic Monolith Casing" class="explainer-img">
+              <img src="images/lipstick-21-tube-capped-standing.png" alt="Magnetic Monolith Casing"
+                class="explainer-img">
             </div>
             <div class="exp-slide" data-caption="PROCESS V • BESPOKE PACKAGING RIBBON">
-              <img src="images/lipstick-22-packaging-box-ribbon.png" alt="Bespoke Packaging Ribbon" class="explainer-img">
+              <img src="images/lipstick-22-packaging-box-ribbon.png" alt="Bespoke Packaging Ribbon"
+                class="explainer-img">
             </div>
           </div>
 
@@ -1499,10 +1516,12 @@
               <img src="images/lipstick-09-hand-picking-up.jpg" alt="Tactile Ergonomic Lift" class="explainer-img">
             </div>
             <div class="exp-slide" data-caption="RITUAL III • SINGLE-GLIDE APPLICATION">
-              <img src="images/lipstick-10-woman-applying-front.jpg" alt="Single-Glide Application" class="explainer-img">
+              <img src="images/lipstick-10-woman-applying-front.jpg" alt="Single-Glide Application"
+                class="explainer-img">
             </div>
             <div class="exp-slide" data-caption="RITUAL IV • HAUTE PRECISION GRIP">
-              <img src="images/lipstick-15-fingers-gripping-detail.png" alt="Haute Precision Grip" class="explainer-img">
+              <img src="images/lipstick-15-fingers-gripping-detail.png" alt="Haute Precision Grip"
+                class="explainer-img">
             </div>
             <div class="exp-slide" data-caption="RITUAL V • WEIGHTLESS SILK LIP FINISH">
               <img src="images/lipstick-16-lips-macro-final.png" alt="Weightless Silk Lip Finish" class="explainer-img">
@@ -1638,7 +1657,8 @@
               <span class="reel-hint">6 Application Rituals</span>
             </div>
             <div class="reel-thumbnails">
-              <button class="reel-thumb active" data-group="3" data-slide="0" type="button" aria-label="Monolith Bullet">
+              <button class="reel-thumb active" data-group="3" data-slide="0" type="button"
+                aria-label="Monolith Bullet">
                 <img src="images/lipstick-08-finished-standing.jpg" alt="Monolith Bullet">
                 <span class="thumb-lbl">Bullet</span>
               </button>
@@ -2415,7 +2435,7 @@
       const modal = document.getElementById('cinema-modal');
       const video = document.getElementById('cinema-video');
       if (modal) modal.classList.add('active');
-      if (video) video.play().catch(() => {});
+      if (video) video.play().catch(() => { });
     }
 
     function closeCinema() {
