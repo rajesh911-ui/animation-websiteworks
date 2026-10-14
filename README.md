@@ -16,6 +16,7 @@ A luxury, cinematic scroll-driven web application revealing the artisanal creati
   - **02 / TRANSFORMATION**: 5-stage molten pigment release and dispersion.
   - **03 / MANUFACTURE**: 5-stage chrome mold shaping and architectural casing.
   - **04 / APPLICATION**: 6-stage couture pickup, single-glide application, and silk velvet finish.
+- **Interactive Filmstrip Reels**: Real-time thumbnail previews and segmented HUD progress indicators.
 - **Automated GitHub Pages CI/CD**: Built-in GitHub Actions workflow (`.github/workflows/deploy.yml`) to automatically publish the website on every commit.
 
 ## 🚀 Local Quick Start
